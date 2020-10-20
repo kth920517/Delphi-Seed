@@ -6,8 +6,8 @@ SamJokO(DongWoo Shin)님께서 제작해주신 소스를 기반으로
 KISA에서 제공하는 테스트 페이지의 결과값과 동일하도록 만들었습니다.
 
 
-- 암복호화 모드 : ECB or CBC/PKCS5PADDING
-- 문자셋 - UTF-8
+- 지원모드 : ECB or CBC/PKCS5PADDING
+- 문자셋   : UTF-8
 - 암복호화 시 Base64를 기본으로 합니다.
 
 
