@@ -15,7 +15,7 @@ unit SeedEncDec;
 interface
 
 uses
-  System.SysUtils, NetEncoding, Seed;
+  System.SysUtils, NetEncoding, SeedCore;
 
 const
   SEED_ENCRYPT = 0;
@@ -68,6 +68,8 @@ type
     FInData : TBytes;
     FOutData : TBytes;
 
+    Base64Encoding : TBase64Encoding;
+
     function ByteArrayToHex(AData: array of Byte; ASplit: Char = #0): string;
 
     procedure Reset;
@@ -75,7 +77,7 @@ type
     procedure BlockXOR(var ABlockData: array of Byte; const AIV: array of Byte);
     procedure PrepareData(AType: Integer; AData: string);
   public
-    constructor Create;
+    constructor Create(ACharPerLine: ShortInt = 76; ALineSeparator: string = sLineBreak);
     destructor Destroy; override;
 
     procedure InitForECB(const AUserKey: string);
@@ -150,9 +152,11 @@ end;
 
 { TSeed }
 
-constructor TSeed.Create;
+constructor TSeed.Create(ACharPerLine: ShortInt; ALineSeparator: string);
 begin
   try
+    Base64Encoding := TBase64Encoding.Create(ACharPerLine, ALineSeparator);
+
     New(SeedInfo);
 
     Burn;
@@ -167,6 +171,8 @@ begin
   Burn;
 
   Dispose(SeedInfo);
+
+  if Assigned(Base64Encoding) then Base64Encoding.Free;  
 
   inherited;
 end;
@@ -237,8 +243,9 @@ begin
   try
     if AType = SEED_ENCRYPT then
       SeedInfo^.Data := TEncoding.UTF8.GetBytes(AData)
-    else
-      SeedInfo^.Data := TNetEncoding.Base64.DecodeStringToBytes(AData);
+    else begin
+      SeedInfo^.Data := Base64Encoding.DecodeStringToBytes(AData);
+    end;
 
     FInLength := Length(SeedInfo^.Data);
 
@@ -351,7 +358,7 @@ begin
       Inc(I, BLOCK_SIZE);
     end;
 
-    Result := TNetEncoding.Base64.EncodeBytesToString(FOutData);
+    Result := Base64Encoding.EncodeBytesToString(FOutData);
 
     isProcessed := True;
   except
