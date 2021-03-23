@@ -15,7 +15,7 @@ unit SeedEncDec;
 interface
 
 uses
-  System.SysUtils, NetEncoding, SeedCore;
+  System.SysUtils, NetEncoding, Seed;
 
 const
   SEED_ENCRYPT = 0;
